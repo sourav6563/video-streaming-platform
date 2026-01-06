@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { env } from "../env";
 
-interface User {
+export interface User {
   username: string;
   email: string;
   fullname: string;
@@ -64,13 +64,11 @@ const userSchema = new Schema<User>(
   { timestamps: true },
 );
 
-/* Pre-save hook (NO typing needed) */
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-/* Methods */
 userSchema.methods.isPasswordCorrect = function (password: string) {
   return bcrypt.compare(password, this.password);
 };
@@ -89,4 +87,4 @@ userSchema.methods.generateRefreshToken = function () {
   });
 };
 
-export const User = model<User>("User", userSchema);
+export const userModel = model<User>("User", userSchema);
