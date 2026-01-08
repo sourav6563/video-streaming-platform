@@ -6,6 +6,8 @@ import { logger } from "./utils/logger";
 import { env } from "./env";
 import "./database/db";
 import healthCheckRouter from "./routes/healthcheck.route";
+import { errorHandler } from "./middlewares/errors.middleware";
+import userRouter from "./routes/user.route";
 const app = express();
 
 app.use(
@@ -38,4 +40,6 @@ app.use(express.urlencoded({ limit: "16kb", extended: true }));
 app.use(express.static("public"));
 app.use(cookieParser());
 app.use("/api/v1/healthcheck", healthCheckRouter);
+app.use("/api/v1/user", userRouter);
+app.use(errorHandler);
 export { app };

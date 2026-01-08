@@ -12,7 +12,7 @@ export interface User {
   watchHistory: Types.ObjectId[];
   refreshToken?: string;
   isEmailVerified: boolean;
-  emailVerificationToken?: string;
+  emailVerificationCode?: string;
   emailVerificationExpires?: Date;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
@@ -65,7 +65,7 @@ const userSchema = new Schema<User, UserModel, UserMethods>(
       type: Boolean,
       default: false,
     },
-    emailVerificationToken: String,
+    emailVerificationCode: String,
     emailVerificationExpires: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
