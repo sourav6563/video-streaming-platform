@@ -38,3 +38,14 @@ export const loginSchema = z.object({
 });
 
 export type LoginDataType = z.infer<typeof loginSchema>;
+
+export const verifyAccountSchema = z.object({
+  username: z
+    .string()
+    .min(1, "Username is required")
+    .transform((v) => v.trim().toLowerCase()),
+
+  code: z.string().regex(/^\d{6}$/, "Verification code must be 6 digits"),
+});
+
+export type VerifyForSignupDataType = z.infer<typeof verifyForSignupSchema>;

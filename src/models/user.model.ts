@@ -4,6 +4,7 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import { env } from "../env";
 
 export interface User {
+  _id: Types.ObjectId;
   username: string;
   email: string;
   fullname: string;
@@ -11,7 +12,7 @@ export interface User {
   password: string;
   watchHistory: Types.ObjectId[];
   refreshToken?: string;
-  isEmailVerified: boolean;
+  isVerified: boolean;
   emailVerificationCode?: string;
   emailVerificationExpires?: Date;
   passwordResetToken?: string;
@@ -61,7 +62,7 @@ const userSchema = new Schema<User, UserModel, UserMethods>(
       },
     ],
     refreshToken: String,
-    isEmailVerified: {
+    isVerified: {
       type: Boolean,
       default: false,
     },
