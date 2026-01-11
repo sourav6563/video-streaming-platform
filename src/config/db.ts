@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { logger } from "../utils/logger";
-import { env } from "../env";
+import { env } from "./env";
 
 export const dbURI = env.MONGODB_URI;
 

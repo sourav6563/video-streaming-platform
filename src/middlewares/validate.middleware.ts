@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ZodTypeAny } from "zod";
+import { ZodError, ZodSchema } from "zod";
 import { ApiError } from "../utils/apiError";
 
 export enum ValidationSource {
@@ -9,15 +9,19 @@ export enum ValidationSource {
   HEADER = "headers",
 }
 
-export const validate =
-  (schema: ZodTypeAny, source: ValidationSource = ValidationSource.BODY) =>
-  (req: Request, _res: Response, next: NextFunction) => {
-    const result = schema.safeParse(req[source]);
-
-    if (!result.success) {
-      throw new ApiError(400, "Validation failed", result.error.format());
+export const validate = (schema: ZodSchema, source: ValidationSource = ValidationSource.BODY) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    try {
+      const data = schema.parse(req[source]);
+      Object.assign(req[source], data);
+      next();
+    } catch (err) {
+      console.log("error:", err);
+      if (err instanceof ZodError) {
+        const message = err.issues.map((e) => e.message).join(", ");
+        return next(new ApiError(400, message));
+      }
+      next(err);
     }
-
-    req[source] = result.data;
-    next();
   };
+};

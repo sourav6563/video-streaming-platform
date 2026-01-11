@@ -72,7 +72,14 @@ export const resetPasswordSchema = z.object({
 export const userProfileSchema = z.object({
   username: z.string().trim().min(1, "Username is required").toLowerCase(),
 });
-
+export const checkUsernameQuerySchema = z.object({
+  username: z
+    .string()
+    .trim()
+    .min(1, "Username is required")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores")
+    .toLowerCase(),
+});
 
 export type SignUpDataType = z.infer<typeof signUpSchema>;
 export type LoginDataType = z.infer<typeof loginSchema>;

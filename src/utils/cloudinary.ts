@@ -2,7 +2,7 @@ import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 import { unlink } from "fs/promises";
 import { existsSync } from "fs";
 import { logger } from "../utils/logger";
-import { env } from "../env";
+import { env } from "../config/env";
 
 // Configure cloudinary
 cloudinary.config({

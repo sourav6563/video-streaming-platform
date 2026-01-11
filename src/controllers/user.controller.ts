@@ -4,10 +4,10 @@ import { ApiError } from "../utils/apiError";
 import { logger } from "../utils/logger";
 import { asyncHandler } from "../utils/asyncHandler";
 import { apiResponse } from "../utils/apiResponse";
-import { sendEmail } from "../utils/mailer";
+import { sendEmail } from "../mail/mailer";
 import crypto from "crypto";
 import { Request, Response } from "express";
-import { env } from "../env";
+import { env } from "../config/env";
 import jwt from "jsonwebtoken";
 import { unlink } from "fs/promises";
 import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary";
@@ -29,6 +29,25 @@ export const generateToken = async (userId: string | Types.ObjectId) => {
     throw new ApiError(500, "something went wrong while generating access and refresh token");
   }
 };
+
+export const isUsernameAvailable = asyncHandler(async (req: Request, res: Response) => {
+  const { username } = req.query;
+
+  const existingVerifiedUser = await userModel.findOne({
+    username,
+    isVerified: true,
+  });
+
+  return res.status(200).json(
+    new apiResponse(
+      200,
+      existingVerifiedUser ? "Username is already taken" : "Username is available",
+      {
+        available: !existingVerifiedUser,
+      },
+    ),
+  );
+});
 
 export const signUpUser = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, username, password } = req.body;
@@ -53,7 +72,7 @@ export const signUpUser = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const verifyCode = crypto.randomInt(100000, 1000000).toString();
-  const verifyExpiry = new Date(Date.now() + 60 * 60 * 1000);
+  const verifyExpiry = new Date(Date.now() + 15 * 60 * 1000);
 
   const defaultImage = `https://ui-avatars.com/api/?name=${encodeURIComponent(
     name,
@@ -93,9 +112,10 @@ export const signUpUser = asyncHandler(async (req: Request, res: Response) => {
 
 export const verifyAccount = asyncHandler(async (req: Request, res: Response) => {
   const { code, email } = req.body;
+  console.log(email, code);
 
   const user = await userModel.findOne({ email: email });
-
+  console.log(user);
   if (!user) {
     throw new ApiError(404, "User not found");
   }
@@ -233,11 +253,9 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
 export const updateName = asyncHandler(async (req: Request, res: Response) => {
   const { name } = req.body;
 
-  const user = await userModel.findByIdAndUpdate(
-    req.user?._id,
-    { $set: { name: name } },
-    { new: true },
-  );
+  const user = await userModel
+    .findByIdAndUpdate(req.user?._id, { $set: { name: name } }, { new: true })
+    .select("-password -refreshToken");
 
   if (!user) {
     throw new ApiError(404, "Name update failed User not found");
@@ -257,11 +275,9 @@ export const updateEmail = asyncHandler(async (req: Request, res: Response) => {
     throw new ApiError(409, "Email is already in use");
   }
 
-  const user = await userModel.findByIdAndUpdate(
-    req.user?._id,
-    { $set: { email: email } },
-    { new: true },
-  );
+  const user = await userModel
+    .findByIdAndUpdate(req.user?._id, { $set: { email: email } }, { new: true })
+    .select("-password -refreshToken");
 
   if (!user) {
     throw new ApiError(404, "Email update failed User not found");
@@ -292,11 +308,9 @@ export const updateProfileImage = asyncHandler(async (req: Request, res: Respons
       throw new ApiError(500, "profileImage upload failed");
     }
 
-    const user = await userModel.findByIdAndUpdate(
-      req.user?._id,
-      { $set: { profileImage: profileImage.url } },
-      { new: true },
-    );
+    const user = await userModel
+      .findByIdAndUpdate(req.user?._id, { $set: { profileImage: profileImage.url } }, { new: true })
+      .select("-password -refreshToken");
 
     if (!user) {
       throw new ApiError(404, "User not found");
@@ -389,15 +403,21 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
   user.refreshToken = undefined;
 
   await user.save({ validateBeforeSave: false });
+  const cookieOptions = {
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+  };
 
   return res
     .status(200)
+    .clearCookie("refreshToken", cookieOptions)
+    .clearCookie("accessToken", cookieOptions)
     .json(new apiResponse(200, "Password reset successful. Please login again"));
 });
 
 export const getUserProfile = asyncHandler(async (req: Request, res: Response) => {
   const { username } = req.params;
-  const myId = new Types.ObjectId(req.user?._id);
+  const myId = req.user?._id;
 
   if (!username?.trim()) {
     throw new ApiError(400, "username is required");
@@ -472,7 +492,7 @@ export const getUserProfile = asyncHandler(async (req: Request, res: Response) =
 });
 
 export const getWatchHistory = asyncHandler(async (req: Request, res: Response) => {
-  const myId = new Types.ObjectId(req.user?._id);
+  const myId = req.user?._id;
 
   const userWithHistory = await userModel.aggregate([
     {
@@ -530,3 +550,5 @@ export const getWatchHistory = asyncHandler(async (req: Request, res: Response) 
       new apiResponse(200, "Watch history fetched successfully", userWithHistory[0].watchHistory),
     );
 });
+
+// console.log(__TS_CHECK_WORKING);

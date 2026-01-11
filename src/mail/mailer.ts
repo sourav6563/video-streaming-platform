@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY!);
 
 type EmailType = "VERIFY" | "RESET";
 
-export const sendEmail = async (type: EmailType,email: string, username: string, code: string) => {
+export const sendEmail = async (type: EmailType, email: string, username: string, code: string) => {
   try {
     const subject = type === "VERIFY" ? "Verify your email" : "Reset your password";
 
@@ -14,7 +14,7 @@ export const sendEmail = async (type: EmailType,email: string, username: string,
           <h2>Hello ${username}</h2>
           <p>Your email verification code:</p>
           <h1>${code}</h1>
-          <p>This code is valid for 1 hour.</p>
+          <p>This code is valid for 15 minutes.</p>
         `
         : `
           <h2>Hello ${username}</h2>

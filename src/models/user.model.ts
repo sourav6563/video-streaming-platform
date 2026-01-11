@@ -1,7 +1,7 @@
 import { Schema, model, Types, Model } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { env } from "../env";
+import { env } from "../config/env";
 
 export interface User {
   _id: Types.ObjectId;
@@ -54,7 +54,6 @@ const userSchema = new Schema<User, UserModel, UserMethods>(
     password: {
       type: String,
       required: true,
-      select: false,
     },
     watchHistory: [
       {
@@ -66,23 +65,18 @@ const userSchema = new Schema<User, UserModel, UserMethods>(
     isVerified: {
       type: Boolean,
       default: false,
-      select: false,
     },
     emailVerificationCode: {
       type: String,
-      select: false,
     },
     emailVerificationExpires: {
       type: Date,
-      select: false,
     },
     passwordResetCode: {
       type: String,
-      select: false,
     },
     passwordResetExpires: {
       type: Date,
-      select: false,
     },
   },
   { timestamps: true },

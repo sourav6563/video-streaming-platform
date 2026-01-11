@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ErrorRequestHandler } from "express";
 import mongoose from "mongoose";
-import { ApiError } from "./apiError";
-import { env } from "../env";
+import { ApiError } from "../utils/apiError";
+import { env } from "../config/env";
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   let error = err;

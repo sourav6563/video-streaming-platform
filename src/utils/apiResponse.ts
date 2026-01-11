@@ -2,7 +2,7 @@ class apiResponse<T> {
   statusCode: number;
   message: string;
   data?: T;
-  success: boolean;
+  success?: boolean;
 
   constructor(statusCode: number, message: string = "success", data?: T) {
     this.statusCode = statusCode;

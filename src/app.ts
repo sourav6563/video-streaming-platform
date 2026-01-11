@@ -3,10 +3,10 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { logger } from "./utils/logger";
-import { env } from "./env";
-import "./database/db";
+import { env } from "./config/env";
+import "./config/db";
 import healthCheckRouter from "./routes/healthcheck.route";
-import { errorHandler } from "./utils/validate";
+import { errorHandler } from "./middlewares/error.middware";
 import userRouter from "./routes/user.route";
 const app = express();
 
