@@ -7,6 +7,7 @@ import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary";
 import { logger } from "../utils/logger";
 import { Request, Response } from "express";
 import { unlink } from "fs/promises";
+import { VideoQuery } from "../validators/video.validator";
 
 export const uploadVideo = asyncHandler(async (req: Request, res: Response) => {
   const owner = req.user?._id;
@@ -107,4 +108,44 @@ export const uploadVideo = asyncHandler(async (req: Request, res: Response) => {
     if (videoFile?.path) await unlink(videoFile.path).catch(() => {});
     if (thumbnailFile?.path) await unlink(thumbnailFile.path).catch(() => {});
   }
+});
+
+export const getAllVideos = asyncHandler(async (req: Request, res: Response) => {
+  const { page, limit, query, sortBy, sortOrder } = req.query as unknown as VideoQuery;
+
+  const filter: any = { isPublished: true };
+
+  if (query) {
+    filter.$text = { $search: query };
+  }
+
+  const sortOptions: any = {
+    [sortBy]: sortOrder === "asc" ? 1 : -1,
+  };
+
+  if (query) {
+    sortOptions.score = { $meta: "textScore" };
+  }
+
+  const aggregate = Video.aggregate([
+    { $match: filter },
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
+        pipeline: [{ $project: { username: 1, name: 1, profileImage: 1 } }],
+      },
+    },
+    { $addFields: { owner: { $first: "$owner" } } },
+    { $sort: sortOptions },
+  ]);
+
+  const results = await Video.aggregatePaginate(aggregate, {
+    page,
+    limit,
+  });
+
+  return res.status(200).json(new apiResponse(200, results, "Videos fetched"));
 });

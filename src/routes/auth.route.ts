@@ -34,19 +34,19 @@ router.route("/signup").post(isGuest, validate(signUpSchema, ValidationSource.BO
 
 router
   .route("/verify-account")
-  .post(validate(verifyAccountSchema, ValidationSource.BODY), verifyAccount);
+  .post(isGuest, validate(verifyAccountSchema, ValidationSource.BODY), verifyAccount);
 
 router.route("/login").post(isGuest, validate(loginSchema, ValidationSource.BODY), loginUser);
 
-router.route("/refresh-token").post(refreshAccessToken);
-
-router.route("/logout").post(authenticate, logoutUser);
-
 router.route("/userinfo").get(authenticate, getUserInfo);
+
+router.route("/refresh-token").post(refreshAccessToken);
 
 router
   .route("/change-password")
-  .post(validate(updatePasswordSchema, ValidationSource.BODY), authenticate, changePassword);
+  .post(authenticate, validate(updatePasswordSchema, ValidationSource.BODY), changePassword);
+
+router.route("/logout").post(authenticate, logoutUser);
 
 router
   .route("/forgot-password")
