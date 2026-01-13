@@ -243,11 +243,10 @@ export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
     .clearCookie("refreshToken", cookieOptions)
     .json(new apiResponse(200, "User logged out successfully"));
 });
-
-export const me = asyncHandler(async (req, res) => {
+export const getUserInfo = asyncHandler(async (req, res) => {
   return res.status(200).json(new apiResponse(200, "User details fetched successfully", req.user));
 });
-export const updatePassword = asyncHandler(async (req: Request, res: Response) => {
+export const changePassword = asyncHandler(async (req: Request, res: Response) => {
   const { oldPassword, newPassword } = req.body;
 
   const user = await userModel.findById(req.user?._id);

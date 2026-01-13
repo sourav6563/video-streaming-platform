@@ -6,6 +6,8 @@ import { Request, Response } from "express";
 import { unlink } from "fs/promises";
 import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/cloudinary";
 
+
+
 export const updateName = asyncHandler(async (req: Request, res: Response) => {
   const { name } = req.body;
 
