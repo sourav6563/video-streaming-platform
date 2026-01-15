@@ -11,6 +11,7 @@ import { VideoQuery } from "../validators/video.validator";
 import { Like } from "../models/like.model";
 import { Comment } from "../models/comment.model";
 import { userModel } from "../models/user.model";
+import { Types } from "mongoose";
 
 export const uploadVideo = asyncHandler(async (req: Request, res: Response) => {
   const owner = req.user?._id;
@@ -151,6 +152,120 @@ export const getAllVideos = asyncHandler(async (req: Request, res: Response) => 
   });
 
   return res.status(200).json(new apiResponse(200, "Videos fetched", results));
+});
+
+export const getVideoById = asyncHandler(async (req: Request, res: Response) => {
+  const { videoId } = req.params;
+
+  const video = await Video.findById(videoId);
+
+  if (!video) {
+    throw new ApiError(404, "Invalid Id Video not found");
+  }
+  const userId = req.user?._id;
+  const isOwner = userId && video.owner.toString() === userId.toString();
+
+  if (!video.isPublished && !isOwner) {
+    throw new ApiError(404, "Video not found");
+  }
+
+  await Video.findByIdAndUpdate(videoId, {
+    $inc: { views: 1 },
+  });
+
+  if (userId) {
+    await userModel.findByIdAndUpdate(userId, {
+      $addToSet: { watchHistory: videoId },
+    });
+  }
+
+  const aggregatedVideo = await Video.aggregate([
+    {
+      $match: {
+        _id: new Types.ObjectId(videoId),
+      },
+    },
+
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
+        pipeline: [
+          {
+            $project: {
+              username: 1,
+              name: 1,
+              profileImage: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $unwind: "$owner",
+    },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "video",
+        as: "likes",
+      },
+    },
+
+    {
+      $lookup: {
+        from: "follows",
+        localField: "owner._id",
+        foreignField: "following",
+        as: "followers",
+      },
+    },
+    {
+      $addFields: {
+        likesCount: { $size: "$likes" },
+        owner: {
+          $mergeObjects: [
+            "$owner",
+            {
+              followersCount: { $size: "$followers" },
+              isFollowed: {
+                $cond: {
+                  if: { $in: [userId, "$followers.follower"] },
+                  then: true,
+                  else: false,
+                },
+              },
+            },
+          ],
+        },
+        isLiked: {
+          $cond: {
+            if: { $in: [userId, "$likes.likedBy"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+
+    {
+      $project: {
+        likes: 0,
+        followers: 0,
+      },
+    },
+  ]);
+
+  if (!aggregatedVideo.length) {
+    throw new ApiError(404, "Video not found");
+  }
+
+  return res
+    .status(200)
+    .json(new apiResponse(200, "Video fetched successfully", aggregatedVideo[0]));
 });
 
 export const updateVideoDetails = asyncHandler(async (req: Request, res: Response) => {
