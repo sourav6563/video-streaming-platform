@@ -1,4 +1,6 @@
-import { Schema, model, Types } from "mongoose";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Schema, model, Types, Model } from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 interface IFollow {
   follower: Types.ObjectId; // who follows
@@ -22,8 +24,12 @@ const followSchema = new Schema<IFollow>(
     timestamps: true,
   },
 );
+followSchema.plugin(mongooseAggregatePaginate);
 
-/* Prevent duplicate follow */
+interface followModel extends Model<IFollow> {
+  aggregatePaginate: any;
+}
+
 followSchema.index({ follower: 1, following: 1 }, { unique: true });
 
-export const Follow = model<IFollow>("Follow", followSchema);
+export const Follow = model<IFollow, followModel>("Follow", followSchema);
