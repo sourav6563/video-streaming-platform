@@ -38,7 +38,7 @@ router
 
 router.route("/login").post(isGuest, validate(loginSchema, ValidationSource.BODY), loginUser);
 
-router.route("/userinfo").get(authenticate, getUserInfo);
+router.route("/info").get(authenticate, getUserInfo);
 
 router.route("/refresh-token").post(refreshAccessToken);
 

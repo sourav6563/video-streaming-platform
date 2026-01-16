@@ -4,7 +4,7 @@ import { ApiError } from "../utils/apiError";
 import { logger } from "../utils/logger";
 import { asyncHandler } from "../utils/asyncHandler";
 import { apiResponse } from "../utils/apiResponse";
-import { sendEmail } from "../mail/mailer";
+import { sendEmail } from "../email/mailer";
 import crypto from "crypto";
 import { Request, Response } from "express";
 import { env } from "../env";

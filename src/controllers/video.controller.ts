@@ -115,14 +115,16 @@ export const uploadVideo = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getAllVideos = asyncHandler(async (req: Request, res: Response) => {
-  const { page, limit, query, sortBy, sortOrder } = req.query as unknown as VideoQuery;
+  const { page, limit, query, sortBy, sortOrder, userId } = req.query as unknown as VideoQuery;
 
   const filter: any = { isPublished: true };
 
   if (query) {
     filter.$text = { $search: query };
   }
-
+  if (userId) {
+    filter.owner = new Types.ObjectId(userId);
+  }
   const sortOptions: any = {
     [sortBy]: sortOrder === "asc" ? 1 : -1,
   };

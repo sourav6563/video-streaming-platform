@@ -14,6 +14,8 @@ export const videoQuerySchema = z.object({
   sortBy: z.enum(["createdAt", "views", "duration", "title"]).default("createdAt"),
 
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
+
+  userId: z.string().trim().default(""),
 });
 
 export type VideoQuery = z.infer<typeof videoQuerySchema>;
