@@ -1,15 +1,15 @@
 import { Router } from "express";
 import {
   forgotPassword,
-  me,
   checkUsername,
   loginUser,
   logoutUser,
   refreshAccessToken,
   resetPassword,
   signUpUser,
-  updatePassword,
   verifyAccount,
+  getUserInfo,
+  changePassword,
 } from "../controllers/auth.controller";
 import {
   checkUsernameQuerySchema,
@@ -23,29 +23,30 @@ import {
 import { validate, ValidationSource } from "../middlewares/validate.middleware";
 import { authenticate } from "../middlewares/authenticate.middleware";
 import { isGuest } from "../middlewares/guest.middleware";
+
 const router = Router();
 
 router
   .route("/check-username")
   .get(validate(checkUsernameQuerySchema, ValidationSource.QUERY), checkUsername);
 
-router.route("/signup").post(isGuest,validate(signUpSchema, ValidationSource.BODY), signUpUser);
+router.route("/signup").post(isGuest, validate(signUpSchema, ValidationSource.BODY), signUpUser);
 
 router
   .route("/verify-account")
-  .post(validate(verifyAccountSchema, ValidationSource.BODY), verifyAccount);
+  .post(isGuest, validate(verifyAccountSchema, ValidationSource.BODY), verifyAccount);
 
-router.route("/login").post(isGuest,validate(loginSchema, ValidationSource.BODY), loginUser);
+router.route("/login").post(isGuest, validate(loginSchema, ValidationSource.BODY), loginUser);
+
+router.route("/info").get(authenticate, getUserInfo);
 
 router.route("/refresh-token").post(refreshAccessToken);
 
-router.route("/logout").post(authenticate, logoutUser);
-
-router.route("/me").get(authenticate, me);
-
 router
-  .route("/update-password")
-  .post(validate(updatePasswordSchema, ValidationSource.BODY), authenticate, updatePassword);
+  .route("/change-password")
+  .post(authenticate, validate(updatePasswordSchema, ValidationSource.BODY), changePassword);
+
+router.route("/logout").post(authenticate, logoutUser);
 
 router
   .route("/forgot-password")

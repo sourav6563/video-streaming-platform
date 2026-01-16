@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { ApiError } from "../utils/apiError";
 import { asyncHandler } from "../utils/asyncHandler";
-import { env } from "../config/env";
+import { env } from "../env";
 import { userModel } from "../models/user.model";
 
 export const authenticate = asyncHandler(async (req: Request, _: Response, next: NextFunction) => {
@@ -22,7 +22,7 @@ export const authenticate = asyncHandler(async (req: Request, _: Response, next:
       throw new ApiError(401, "UNAUTHORIZED");
     }
 
-    req.user = user;
+    req.user = user
     next();
   } catch (error: any) {
     if (error.name === "TokenExpiredError") {

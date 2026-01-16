@@ -3,7 +3,7 @@
 import { ErrorRequestHandler } from "express";
 import mongoose from "mongoose";
 import { ApiError } from "../utils/apiError";
-import { env } from "../config/env";
+import { env } from "../env";
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   let error = err;

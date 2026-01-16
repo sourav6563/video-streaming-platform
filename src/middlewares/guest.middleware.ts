@@ -1,4 +1,4 @@
-import { env } from "../config/env";
+import { env } from "../env";
 import { ApiError } from "../utils/apiError";
 
 import { asyncHandler } from "../utils/asyncHandler";

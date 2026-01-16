@@ -1,4 +1,5 @@
-import { Schema, model, Types } from "mongoose";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Schema, model, Types, Model } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 interface Video {
@@ -64,4 +65,8 @@ videoSchema.plugin(mongooseAggregatePaginate);
 
 videoSchema.index({ title: "text", description: "text" });
 
-export const Video = model<Video>("Video", videoSchema);
+interface VideoModel extends Model<Video> {
+  aggregatePaginate: any;
+}
+
+export const Video = model<Video, VideoModel>("Video", videoSchema);

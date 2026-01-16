@@ -4,10 +4,10 @@ import { ApiError } from "../utils/apiError";
 import { logger } from "../utils/logger";
 import { asyncHandler } from "../utils/asyncHandler";
 import { apiResponse } from "../utils/apiResponse";
-import { sendEmail } from "../mail/mailer";
+import { sendEmail } from "../email/mailer";
 import crypto from "crypto";
 import { Request, Response } from "express";
-import { env } from "../config/env";
+import { env } from "../env";
 import jwt from "jsonwebtoken";
 
 export const generateToken = async (userId: string | Types.ObjectId) => {
@@ -243,11 +243,10 @@ export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
     .clearCookie("refreshToken", cookieOptions)
     .json(new apiResponse(200, "User logged out successfully"));
 });
-
-export const me = asyncHandler(async (req, res) => {
+export const getUserInfo = asyncHandler(async (req, res) => {
   return res.status(200).json(new apiResponse(200, "User details fetched successfully", req.user));
 });
-export const updatePassword = asyncHandler(async (req: Request, res: Response) => {
+export const changePassword = asyncHandler(async (req: Request, res: Response) => {
   const { oldPassword, newPassword } = req.body;
 
   const user = await userModel.findById(req.user?._id);

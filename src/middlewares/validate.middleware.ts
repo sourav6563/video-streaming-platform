@@ -16,7 +16,6 @@ export const validate = (schema: ZodSchema, source: ValidationSource = Validatio
       Object.assign(req[source], data);
       next();
     } catch (err) {
-      console.log("error:", err);
       if (err instanceof ZodError) {
         const message = err.issues.map((e) => e.message).join(", ");
         return next(new ApiError(400, message));

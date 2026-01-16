@@ -1,7 +1,7 @@
 import { Schema, model, Types, Model } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { env } from "../config/env";
+import { env } from "../env";
 
 export interface User {
   _id: Types.ObjectId;
@@ -26,7 +26,8 @@ export interface UserMethods {
 }
 
 // Create a type that combines User interface with UserMethods
-type UserModel = Model<User, object, UserMethods>;
+export type UserModel = Model<User, object, UserMethods>;
+
 
 const userSchema = new Schema<User, UserModel, UserMethods>(
   {
