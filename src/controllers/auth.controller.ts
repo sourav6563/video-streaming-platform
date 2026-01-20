@@ -110,7 +110,6 @@ export const signUpUser = asyncHandler(async (req: Request, res: Response) => {
 
 export const verifyAccount = asyncHandler(async (req: Request, res: Response) => {
   const { code, email } = req.body;
- 
 
   const user = await userModel.findOne({ email: email });
   console.log(user);
@@ -243,9 +242,11 @@ export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
     .clearCookie("refreshToken", cookieOptions)
     .json(new apiResponse(200, "User logged out successfully"));
 });
+
 export const getUserInfo = asyncHandler(async (req, res) => {
   return res.status(200).json(new apiResponse(200, "User details fetched successfully", req.user));
 });
+
 export const changePassword = asyncHandler(async (req: Request, res: Response) => {
   const { oldPassword, newPassword } = req.body;
 
@@ -263,6 +264,7 @@ export const changePassword = asyncHandler(async (req: Request, res: Response) =
   await user.save({ validateBeforeSave: false });
   return res.status(200).json(new apiResponse(200, "Password changed successfully"));
 });
+
 export const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
   const { email } = req.body;
 

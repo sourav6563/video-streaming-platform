@@ -1,10 +1,16 @@
 import { Router } from "express";
 import { authenticate } from "../middlewares/authenticate.middleware";
-import { getVideos } from "../controllers/dashboard.controller";
+import {
+  getDashboardPlaylists,
+  getDashboardStats,
+  getDashboardVideos,
+} from "../controllers/dashboard.controller";
 
 const router = Router();
 //get user videos
 router.use(authenticate);
-router.route("/videos").get(getVideos);
+router.route("/stats").get(getDashboardStats);
+router.route("/videos").get(getDashboardVideos);
+router.route("/playlists").get(getDashboardPlaylists);
 
 export default router;

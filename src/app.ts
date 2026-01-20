@@ -16,12 +16,34 @@ import playlistRouter from "./routes/playlist.route";
 import dashboardRouter from "./routes/dashboard.route";
 import communityPostRouter from "./routes/communityPost.route";
 import followerRouter from "./routes/follower.route";
+import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
 const app = express();
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  message: "Too many requests , please try again later.",
+});
+app.use("/api", limiter);
+app.use(helmet());
+app.use(mongoSanitize());
 
 app.use(
   cors({
     origin: env.CORS_ORIGIN,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "device-remember-token",
+      "Access-Control-Allow-Origin",
+      "Origin",
+      "Accept",
+    ],
   }),
 );
 
@@ -47,7 +69,7 @@ app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ limit: "16kb", extended: true }));
 app.use(express.static("public"));
 app.use(cookieParser());
-app.use("/api/v1/healthcheck", healthCheckRouter);
+app.use("/health", healthCheckRouter);
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);

@@ -1,4 +1,6 @@
-import { Schema, model, Types } from "mongoose";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Schema, model, Types, Model } from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 interface IPlaylist {
   owner: Types.ObjectId;
@@ -36,5 +38,10 @@ const playlistSchema = new Schema<IPlaylist>(
     timestamps: true,
   },
 );
+playlistSchema.plugin(mongooseAggregatePaginate);
 
-export const Playlist = model<IPlaylist>("Playlist", playlistSchema);
+interface PlaylistModel extends Model<IPlaylist> {
+  aggregatePaginate: any;
+}
+
+export const Playlist = model<IPlaylist, PlaylistModel>("Playlist", playlistSchema);
