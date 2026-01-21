@@ -16,23 +16,17 @@ import {
 } from "../validators/user.validator";
 
 const router = Router();
+router.use(authenticate);
+router.route("/name").patch(validate(updateNameSchema, ValidationSource.BODY), updateName);
+
+router.route("/email").patch(validate(updateEmailSchema, ValidationSource.BODY), updateEmail);
+
+router.route("/profileimage").patch(upload.single("profileImage"), updateProfileImage);
 
 router
-  .route("/update-name")
-  .patch(validate(updateNameSchema, ValidationSource.BODY), authenticate, updateName);
+  .route("/u/:username")
+  .get(validate(userProfileSchema, ValidationSource.PARAM), getUserProfile);
 
-router
-  .route("/update-email")
-  .patch(validate(updateEmailSchema, ValidationSource.BODY), authenticate, updateEmail);
-
-router
-  .route("/update-profile-image")
-  .patch(upload.single("profileImage"), authenticate, updateProfileImage);
-
-router
-  .route("/user-profile/:username")
-  .get(validate(userProfileSchema, ValidationSource.PARAM), authenticate, getUserProfile);
-
-router.route("/watch-history").get(authenticate, getWatchHistory);
+router.route("/history").get(authenticate, getWatchHistory);
 
 export default router;

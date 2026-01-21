@@ -1,5 +1,7 @@
-export const getEmailTemplate = (type: "VERIFY" | "RESET", username: string, code: string) => {
-  const isVerify = type === "VERIFY";
+import { EmailTypes } from "../constants";
+
+export const getEmailTemplate = (type: EmailTypes, username: string, code: string) => {
+  const isVerify = type === EmailTypes.VERIFY;
   const title = isVerify ? "Verify Your Email" : "Reset Your Password";
   const description = isVerify
     ? "Thank you for signing up! Please use the verification code below to confirm your email address and complete your registration."

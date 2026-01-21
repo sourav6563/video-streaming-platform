@@ -1,7 +1,6 @@
 import { Router } from "express";
 import {
   forgotPassword,
-  checkUsername,
   loginUser,
   logoutUser,
   refreshAccessToken,
@@ -10,25 +9,26 @@ import {
   verifyAccount,
   getUserInfo,
   changePassword,
+  isUsernameAvailable,
 } from "../controllers/auth.controller";
 import {
-  checkUsernameQuerySchema,
+  userNameAvailabilitySchema,
   forgotPasswordSchema,
   loginSchema,
   resetPasswordSchema,
   signUpSchema,
   updatePasswordSchema,
   verifyAccountSchema,
-} from "../validators/user.validator";
+} from "../validators/auth.validator";
 import { validate, ValidationSource } from "../middlewares/validate.middleware";
 import { authenticate } from "../middlewares/authenticate.middleware";
 import { isGuest } from "../middlewares/guest.middleware";
 
 const router = Router();
-
+//public route
 router
-  .route("/check-username")
-  .get(validate(checkUsernameQuerySchema, ValidationSource.QUERY), checkUsername);
+  .route("/username-availability")
+  .get(validate(userNameAvailabilitySchema, ValidationSource.QUERY), isUsernameAvailable);
 
 router.route("/signup").post(isGuest, validate(signUpSchema, ValidationSource.BODY), signUpUser);
 
@@ -38,15 +38,7 @@ router
 
 router.route("/login").post(isGuest, validate(loginSchema, ValidationSource.BODY), loginUser);
 
-router.route("/info").get(authenticate, getUserInfo);
-
 router.route("/refresh-token").post(refreshAccessToken);
-
-router
-  .route("/change-password")
-  .post(authenticate, validate(updatePasswordSchema, ValidationSource.BODY), changePassword);
-
-router.route("/logout").post(authenticate, logoutUser);
 
 router
   .route("/forgot-password")
@@ -55,5 +47,15 @@ router
 router
   .route("/reset-password")
   .post(validate(resetPasswordSchema, ValidationSource.BODY), resetPassword);
+
+//private route
+router.use(authenticate);
+router.route("/info").get(getUserInfo);
+
+router
+  .route("/change-password")
+  .post(validate(updatePasswordSchema, ValidationSource.BODY), changePassword);
+
+router.route("/logout").post(logoutUser);
 
 export default router;

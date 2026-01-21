@@ -158,7 +158,7 @@ export const getUserProfile = asyncHandler(async (req: Request, res: Response) =
 
   return res
     .status(200)
-    .json(new apiResponse(200, profile[0], "User profile fetched successfully"));
+    .json(new apiResponse(200, "User profile fetched successfully", profile[0]));
 });
 
 export const getWatchHistory = asyncHandler(async (req: Request, res: Response) => {

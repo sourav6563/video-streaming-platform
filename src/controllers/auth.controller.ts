@@ -9,6 +9,7 @@ import crypto from "crypto";
 import { Request, Response } from "express";
 import { env } from "../env";
 import jwt from "jsonwebtoken";
+import { COOKIE_OPTIONS, CookieNames, EmailTypes } from "../constants";
 
 export const generateToken = async (userId: string | Types.ObjectId) => {
   try {
@@ -28,7 +29,7 @@ export const generateToken = async (userId: string | Types.ObjectId) => {
   }
 };
 
-export const checkUsername = asyncHandler(async (req: Request, res: Response) => {
+export const isUsernameAvailable = asyncHandler(async (req: Request, res: Response) => {
   const { username } = req.query;
 
   const existingVerifiedUser = await userModel.findOne({
@@ -100,7 +101,7 @@ export const signUpUser = asyncHandler(async (req: Request, res: Response) => {
     });
   }
 
-  const mail = await sendEmail("VERIFY", email, username, verifyCode);
+  const mail = await sendEmail(EmailTypes.VERIFY, email, username, verifyCode);
   if (!mail.success) {
     throw new ApiError(500, "Failed to send verification email");
   }
@@ -112,7 +113,7 @@ export const verifyAccount = asyncHandler(async (req: Request, res: Response) =>
   const { code, email } = req.body;
 
   const user = await userModel.findOne({ email: email });
-  console.log(user);
+
   if (!user) {
     throw new ApiError(404, "User not found");
   }
@@ -165,15 +166,10 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     throw new ApiError(500, "something went wrong while logging in user");
   }
 
-  const cookieOptions = {
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-  };
-
   return res
     .status(200)
-    .cookie("accessToken", accessToken, cookieOptions)
-    .cookie("refreshToken", refreshToken, cookieOptions)
+    .cookie(CookieNames.ACCESS_TOKEN, accessToken, COOKIE_OPTIONS)
+    .cookie(CookieNames.REFRESH_TOKEN, refreshToken, COOKIE_OPTIONS)
     .json(new apiResponse(200, "User logged in successfully", loggedInUser));
 });
 
@@ -201,15 +197,10 @@ export const refreshAccessToken = asyncHandler(async (req: Request, res: Respons
 
   const { accessToken, refreshToken } = await generateToken(user._id);
 
-  const cookieOptions = {
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-  };
-
   return res
     .status(200)
-    .cookie("accessToken", accessToken, cookieOptions)
-    .cookie("refreshToken", refreshToken, cookieOptions)
+    .cookie(CookieNames.ACCESS_TOKEN, accessToken, COOKIE_OPTIONS)
+    .cookie(CookieNames.REFRESH_TOKEN, refreshToken, COOKIE_OPTIONS)
     .json(new apiResponse(200, "Access token refreshed successfully"));
 });
 
@@ -231,15 +222,10 @@ export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
     throw new ApiError(404, "User not found");
   }
 
-  const cookieOptions = {
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-  };
-
   return res
     .status(200)
-    .clearCookie("accessToken", cookieOptions)
-    .clearCookie("refreshToken", cookieOptions)
+    .clearCookie(CookieNames.ACCESS_TOKEN, COOKIE_OPTIONS)
+    .clearCookie(CookieNames.REFRESH_TOKEN, COOKIE_OPTIONS)
     .json(new apiResponse(200, "User logged out successfully"));
 });
 
@@ -270,10 +256,6 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response) =
 
   const user = await userModel.findOne({ email });
 
-  // if (!user) {
-  //   throw new ApiError(404, "User not found");
-  // }
-
   if (!user || !user.isVerified) {
     throw new ApiError(400, "User not found");
   }
@@ -286,7 +268,7 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response) =
 
   await user.save({ validateBeforeSave: false });
 
-  const mail = await sendEmail("RESET", user.email, user.username, resetCode);
+  const mail = await sendEmail(EmailTypes.RESET, user.email, user.username, resetCode);
 
   if (!mail.success) {
     throw new ApiError(500, "Failed to send reset password email");
@@ -322,14 +304,10 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
   user.refreshToken = undefined;
 
   await user.save({ validateBeforeSave: false });
-  const cookieOptions = {
-    httpOnly: true,
-    secure: env.NODE_ENV === "production",
-  };
 
   return res
     .status(200)
-    .clearCookie("refreshToken", cookieOptions)
-    .clearCookie("accessToken", cookieOptions)
+    .clearCookie(CookieNames.REFRESH_TOKEN, COOKIE_OPTIONS)
+    .clearCookie(CookieNames.ACCESS_TOKEN, COOKIE_OPTIONS)
     .json(new apiResponse(200, "Password reset successful. Please login again"));
 });

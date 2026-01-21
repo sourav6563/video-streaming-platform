@@ -1,14 +1,20 @@
 import { Resend } from "resend";
 import { getEmailTemplate } from "./emailtemplate";
 import { env } from "../env";
+import { EmailTypes } from "../constants";
 
 const resend = new Resend(env.RESEND_API_KEY);
 
-type EmailType = "VERIFY" | "RESET";
+// type EmailType = "VERIFY" | "RESET";
 
-export const sendEmail = async (type: EmailType, email: string, username: string, code: string) => {
+export const sendEmail = async (
+  type: EmailTypes,
+  email: string,
+  username: string,
+  code: string,
+) => {
   try {
-    const subject = type === "VERIFY" ? "Verify your email" : "Reset your password";
+    const subject = type === EmailTypes.VERIFY ? "Verify your email" : "Reset your password";
 
     await resend.emails.send({
       from: "onboarding@resend.dev",
