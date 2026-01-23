@@ -6,7 +6,7 @@ import { logger } from "./utils/logger";
 import { env } from "./env";
 import "./database/db";
 import healthCheckRouter from "./routes/healthcheck.route";
-import { errorHandler } from "./middlewares/errorhandler.middware";
+import { errorHandler } from "./middlewares/errorhandler.middleware";
 import userRouter from "./routes/user.route";
 import authRouter from "./routes/auth.route";
 import videoRouter from "./routes/video.route";
@@ -29,6 +29,7 @@ const limiter = rateLimit({
   limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
   message: "Too many requests , please try again later.",
 });
+app.use("/api", limiter);
 app.use(helmet());
 
 app.use(
@@ -67,11 +68,10 @@ app.use(
 //common middleware
 
 app.use(express.static("public"));
-app.use("/api/v1/health", healthCheckRouter);
-app.use(limiter);
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ limit: "16kb", extended: true }));
 app.use(cookieParser());
+app.use("/health", healthCheckRouter);
 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
@@ -82,7 +82,7 @@ app.use("/api/v1/playlist", playlistRouter);
 app.use("/api/v1/communitypost", communityPostRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/follower", followerRouter);
-app.use("/api-docs", swaggerRouter);
+app.use("/api/v1/docs", swaggerRouter);
 
 app.use(errorHandler);
 export { app };
