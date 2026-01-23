@@ -105,20 +105,26 @@ export const toggleCommunityPostLike = asyncHandler(async (req: Request, res: Re
 
 export const getLikedVideos = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.user?._id;
+
   const likedVideos = await Like.aggregate([
+    // 1. Find all likes by this user
     {
       $match: {
         likedBy: userId,
-        video: { $exists: true, $ne: null },
       },
     },
+    // 2. Lookup the video details
     {
       $lookup: {
         from: "videos",
         localField: "video",
         foreignField: "_id",
-        as: "video",
+        as: "likedVideo",
         pipeline: [
+          {
+            $match: { isPublished: true }, // OPTIONAL: Filter out unpublished/deleted videos
+          },
+          // 3. Lookup the owner of the video (Nested Lookup)
           {
             $lookup: {
               from: "users",
@@ -144,11 +150,25 @@ export const getLikedVideos = asyncHandler(async (req: Request, res: Response) =
         ],
       },
     },
+    // 4. Unwind the video array (removes likes on deleted videos that returned empty arrays)
     {
-      $unwind: "$video",
+      $unwind: "$likedVideo",
     },
+    // 5. Clean Projection (Matches getAllVideos format)
     {
-      $replaceRoot: { newRoot: "$video" },
+      $project: {
+        _id: "$likedVideo._id",
+        owner: "$likedVideo.owner",
+        title: "$likedVideo.title",
+        description: "$likedVideo.description",
+        views: "$likedVideo.views",
+        duration: "$likedVideo.duration",
+        createdAt: "$likedVideo.createdAt",
+        isPublished: "$likedVideo.isPublished",
+        // Flatten the Cloudinary objects to just URLs
+        videoFile: "$likedVideo.videoFile.url",
+        thumbnail: "$likedVideo.thumbnail.url",
+      },
     },
   ]);
 

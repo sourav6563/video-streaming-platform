@@ -20,6 +20,7 @@ const options: swaggerJSDoc.Options = {
         url: `http://localhost:${env.PORT}/api/v1`,
         description: "Development Server",
       },
+      
     ],
 
     components: {
@@ -39,9 +40,9 @@ const options: swaggerJSDoc.Options = {
       { name: "Like", description: "Like related endpoints" },
       { name: "Comment", description: "Comment related endpoints" },
       { name: "Playlist", description: "Playlist related endpoints" },
+      { name: "CommunityPost", description: "Community Post related endpoints" },
       { name: "Follower", description: "Follower related endpoints" },
       { name: "Dashboard", description: "Dashboard related endpoints" },
-      { name: "Health", description: "Health check endpoints" },
     ],
   },
 
