@@ -41,7 +41,7 @@ const router = Router();
  *           type: string
  *         name:
  *           type: string
- *         avatar:
+ *         profileImage:
  *           type: string
  *         userId:
  *           type: string

@@ -137,7 +137,7 @@ export const getUserFollowing = asyncHandler(async (req: Request, res: Response)
         _id: 1,
         username: "$followingDetails.username",
         name: "$followingDetails.name",
-        avatar: "$followingDetails.profileImage",
+        profileImage: "$followingDetails.profileImage",
         userId: "$followingDetails._id",
         createdAt: 1,
       },

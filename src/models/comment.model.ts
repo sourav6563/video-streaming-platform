@@ -19,12 +19,12 @@ const commentSchema = new Schema<IComment>(
     video: {
       type: Schema.Types.ObjectId,
       ref: "Video",
-      required: true,
       index: true,
     },
     communityPost: {
       type: Schema.Types.ObjectId,
       ref: "CommunityPost",
+      index: true,
     },
     owner: {
       type: Schema.Types.ObjectId,

@@ -117,7 +117,7 @@ export const deleteCommunityPost = asyncHandler(async (req: Request, res: Respon
 
   await CommunityPost.findByIdAndDelete(postId);
 
-  Promise.all([
+  await Promise.all([
     Like.deleteMany({ communityPost: postId }),
     Comment.deleteMany({ communityPost: postId }),
   ]).catch((err) => logger.error(`Cleanup failed for post ${postId}`, err));

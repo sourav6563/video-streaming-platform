@@ -573,7 +573,7 @@ export const deleteVideo = asyncHandler(async (req: Request, res: Response) => {
   const thumbPid = video.thumbnail?.public_id;
 
   try {
-    await Video.findByIdAndDelete(videoId);
+    await video.deleteOne();
 
     await Promise.all([
       Like.deleteMany({ video: videoId }),
