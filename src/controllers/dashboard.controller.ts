@@ -14,57 +14,57 @@ export const getDashboardStats = asyncHandler(async (req: Request, res: Response
     throw new ApiError(401, "Unauthorized request");
   }
 
-  const videoStats = await Video.aggregate([
-    {
-      $match: {
-        owner: userId, // Filter: My Videos
+  const [videoStats, followerStats, likeStats] = await Promise.all([
+    Video.aggregate([
+      {
+        $match: {
+          owner: userId, // Filter: My Videos
+        },
       },
-    },
-    {
-      $group: {
-        _id: null,
-        totalVideos: { $sum: 1 }, // Count of videos
-        totalViews: { $sum: "$views" }, // Sum of views
+      {
+        $group: {
+          _id: null,
+          totalVideos: { $sum: 1 }, // Count of videos
+          totalViews: { $sum: "$views" }, // Sum of views
+        },
       },
-    },
-  ]);
-
-  const followerStats = await Follow.aggregate([
-    {
-      $match: {
-        following: userId,
+    ]),
+    Follow.aggregate([
+      {
+        $match: {
+          following: userId,
+        },
       },
-    },
-    {
-      $count: "followersCount",
-    },
-  ]);
-
-  const likeStats = await Like.aggregate([
-    {
-      $match: {
-        video: { $exists: true }, // Only consider video likes
+      {
+        $count: "followersCount",
       },
-    },
-    {
-      $lookup: {
-        from: "videos",
-        localField: "video",
-        foreignField: "_id",
-        as: "videoDetails",
+    ]),
+    Like.aggregate([
+      {
+        $match: {
+          video: { $exists: true }, // Only consider video likes
+        },
       },
-    },
-    {
-      $unwind: "$videoDetails",
-    },
-    {
-      $match: {
-        "videoDetails.owner": userId, // Filter: My Content
+      {
+        $lookup: {
+          from: "videos",
+          localField: "video",
+          foreignField: "_id",
+          as: "videoDetails",
+        },
       },
-    },
-    {
-      $count: "totalLikes",
-    },
+      {
+        $unwind: "$videoDetails",
+      },
+      {
+        $match: {
+          "videoDetails.owner": userId, // Filter: My Content
+        },
+      },
+      {
+        $count: "totalLikes",
+      },
+    ]),
   ]);
 
   const stats = {
@@ -77,21 +77,4 @@ export const getDashboardStats = asyncHandler(async (req: Request, res: Response
   return res.status(200).json(new apiResponse(200, "Dashboard stats fetched successfully", stats));
 });
 
-// export const getVideos = asyncHandler(async (req: Request, res: Response) => {
-//   const userId = req.user?._id;
 
-//   if (!userId) {
-//     throw new ApiError(401, "Unauthorized");
-//   }
-
-//   try {
-//     const videos = await Video.find({ owner: userId })
-//       .sort({ createdAt: -1 }) // newest first
-//       .populate("owner", "username fullname profileImage");
-
-//     return res.status(200).json(new apiResponse(200, "User videos fetched successfully", videos));
-//   } catch (error) {
-//     logger.error("getUserVideos error:", error);
-//     throw new ApiError(500, "Failed to fetch user videos");
-//   }
-// });
