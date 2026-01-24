@@ -5,20 +5,20 @@ import {
   logoutUser,
   refreshAccessToken,
   resetPassword,
-  signUpUser,
   verifyAccount,
   changePassword,
   checkUsername,
   getMe,
+  registerUser,
 } from "../controllers/auth.controller";
 import {
   forgotPasswordSchema,
   loginSchema,
   resetPasswordSchema,
-  signUpSchema,
   updatePasswordSchema,
   verifyAccountSchema,
   checkUsernameSchema,
+  registerSchema,
 } from "../validators/auth.validator";
 import { validate, ValidationSource } from "../middlewares/validate.middleware";
 import { authenticate } from "../middlewares/authenticate.middleware";
@@ -99,7 +99,7 @@ router
 
 /**
  * @swagger
- * /auth/signup:
+ * /auth/register:
  *   post:
  *     tags: [Auth]
  *     summary: Register new user
@@ -156,7 +156,9 @@ router
  *       500:
  *         description: Failed to send verification email
  */
-router.route("/signup").post(isGuest, validate(signUpSchema, ValidationSource.BODY), signUpUser);
+router
+  .route("/register")
+  .post(isGuest, validate(registerSchema, ValidationSource.BODY), registerUser);
 
 /**
  * @swagger

@@ -1,5 +1,5 @@
 import * as z from "zod";
-export const signUpSchema = z.object({
+export const registerSchema = z.object({
   name: z.string().trim().min(1, "Name is required"),
 
   email: z.string().min(1, "Email is required").trim().toLowerCase().email("Invalid email format"),
