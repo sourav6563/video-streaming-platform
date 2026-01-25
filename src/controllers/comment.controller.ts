@@ -93,7 +93,7 @@ export const addVideoComment = asyncHandler(async (req: Request, res: Response) 
 
   const video = await Video.findById(videoId);
   if (!video) {
-    throw new ApiError(404, "Invalid Id  Video not found");
+    throw new ApiError(404, "Video not found");
   }
   const comment = await Comment.create({
     content,
@@ -118,7 +118,7 @@ export const getPostComments = asyncHandler(async (req: Request, res: Response) 
   const post = await CommunityPost.findById(postId);
 
   if (!post) {
-    throw new ApiError(404, "Invalid Id Community post not found");
+    throw new ApiError(404, "Community post not found");
   }
 
   const pipeline = [
@@ -194,7 +194,7 @@ export const addPostComment = asyncHandler(async (req: Request, res: Response) =
 
   const post = await CommunityPost.findById(postId);
   if (!post) {
-    throw new ApiError(404, " Invalid Id Community post not found");
+    throw new ApiError(404, "Community post not found");
   }
   const comment = await Comment.create({
     content,
@@ -218,7 +218,7 @@ export const updateComment = asyncHandler(async (req: Request, res: Response) =>
   const comment = await Comment.findById(commentId);
 
   if (!comment) {
-    throw new ApiError(404, " Invalid Id Comment not found");
+    throw new ApiError(404, "Comment not found");
   }
 
   if (!comment.owner.equals(req.user?._id)) {
@@ -238,7 +238,7 @@ export const deleteComment = asyncHandler(async (req: Request, res: Response) =>
   const comment = await Comment.findById(commentId);
 
   if (!comment) {
-    throw new ApiError(404, "Invalid Id Comment not found");
+    throw new ApiError(404, "Comment not found");
   }
 
   if (!comment.owner.equals(userId)) {

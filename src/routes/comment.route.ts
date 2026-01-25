@@ -10,6 +10,11 @@ import {
 } from "../controllers/comment.controller";
 import { validate, ValidationSource } from "../middlewares/validate.middleware";
 import { commentContentSchema } from "../validators/comment.validator";
+import {
+  commentIdParamSchema,
+  postIdParamSchema,
+  videoIdParamSchema,
+} from "../validators/common.validator";
 
 const router = Router();
 
@@ -187,8 +192,13 @@ const router = Router();
  */
 router
   .route("/video-comments/:videoId")
-  .get(authenticate, getVideoComments)
-  .post(authenticate, validate(commentContentSchema, ValidationSource.BODY), addVideoComment);
+  .get(authenticate, validate(videoIdParamSchema, ValidationSource.PARAM), getVideoComments)
+  .post(
+    authenticate,
+    validate(videoIdParamSchema, ValidationSource.PARAM),
+    validate(commentContentSchema, ValidationSource.BODY),
+    addVideoComment,
+  );
 
 /**
  * @swagger
@@ -287,8 +297,13 @@ router
  */
 router
   .route("/post-comments/:postId")
-  .get(authenticate, getPostComments)
-  .post(authenticate, validate(commentContentSchema, ValidationSource.BODY), addPostComment);
+  .get(authenticate, validate(postIdParamSchema, ValidationSource.PARAM), getPostComments)
+  .post(
+    authenticate,
+    validate(postIdParamSchema, ValidationSource.PARAM),
+    validate(commentContentSchema, ValidationSource.BODY),
+    addPostComment,
+  );
 
 /**
  * @swagger
@@ -380,7 +395,12 @@ router
  */
 router
   .route("/:commentId")
-  .patch(authenticate, validate(commentContentSchema, ValidationSource.BODY), updateComment)
-  .delete(authenticate, deleteComment);
+  .patch(
+    authenticate,
+    validate(commentIdParamSchema, ValidationSource.PARAM),
+    validate(commentContentSchema, ValidationSource.BODY),
+    updateComment,
+  )
+  .delete(authenticate, validate(commentIdParamSchema, ValidationSource.PARAM), deleteComment);
 
 export default router;

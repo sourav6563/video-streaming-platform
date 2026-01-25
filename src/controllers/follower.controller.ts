@@ -12,7 +12,7 @@ export const toggleFollow = asyncHandler(async (req: Request, res: Response) => 
 
   const user = await userModel.findById(userId);
   if (!user) {
-    throw new ApiError(404, " Invalid Id User not found");
+    throw new ApiError(404, "User not found");
   }
 
   if (currentUserId?.equals(new Types.ObjectId(userId))) {
@@ -44,7 +44,7 @@ export const getUserFollowers = asyncHandler(async (req: Request, res: Response)
 
   const user = await userModel.findById(userId);
   if (!user) {
-    throw new ApiError(404, " Invalid Id User not found");
+    throw new ApiError(404, "User not found");
   }
   const aggregate = Follow.aggregate([
     {
@@ -98,7 +98,7 @@ export const getUserFollowing = asyncHandler(async (req: Request, res: Response)
 
   const user = await userModel.findById(userId);
   if (!user) {
-    throw new ApiError(404, "Invalid Id User not found");
+    throw new ApiError(404, "User not found");
   }
 
   const aggregate = Follow.aggregate([

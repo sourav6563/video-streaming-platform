@@ -14,7 +14,7 @@ export const toggleVideoLike = asyncHandler(async (req: Request, res: Response) 
 
   const video = await Video.findById(videoId);
   if (!video) {
-    throw new ApiError(404, " Invalid Id Video not found");
+    throw new ApiError(404, "Video not found");
   }
 
   // Single DB call: delete if exists, otherwise returns null
@@ -44,7 +44,7 @@ export const toggleCommentLike = asyncHandler(async (req: Request, res: Response
 
   const comment = await Comment.findById(commentId);
   if (!comment) {
-    throw new ApiError(404, "Invalid Id Comment not found");
+    throw new ApiError(404, "Comment not found");
   }
 
   const deletedLike = await Like.findOneAndDelete({
@@ -74,7 +74,7 @@ export const toggleCommunityPostLike = asyncHandler(async (req: Request, res: Re
 
   const post = await CommunityPost.findById(postId);
   if (!post) {
-    throw new ApiError(404, " Invalid Id Community post not found");
+    throw new ApiError(404, "Community post not found");
   }
 
   const deletedLike = await Like.findOneAndDelete({

@@ -5,6 +5,8 @@ import {
   getUserFollowing,
   toggleFollow,
 } from "../controllers/follower.controller";
+import { validate, ValidationSource } from "../middlewares/validate.middleware";
+import { userIdParamSchema } from "../validators/common.validator";
 
 const router = Router();
 
@@ -137,7 +139,9 @@ router.use(authenticate);
  *       401:
  *         description: Unauthorized
  */
-router.route("/toggle/:userId").post(toggleFollow);
+router
+  .route("/toggle/:userId")
+  .post(validate(userIdParamSchema, ValidationSource.PARAM), toggleFollow);
 
 /**
  * @swagger
@@ -186,7 +190,9 @@ router.route("/toggle/:userId").post(toggleFollow);
  *       401:
  *         description: Unauthorized
  */
-router.route("/followers/:userId").get(getUserFollowers);
+router
+  .route("/followers/:userId")
+  .get(validate(userIdParamSchema, ValidationSource.PARAM), getUserFollowers);
 
 /**
  * @swagger
@@ -235,6 +241,8 @@ router.route("/followers/:userId").get(getUserFollowers);
  *       401:
  *         description: Unauthorized
  */
-router.route("/following/:userId").get(getUserFollowing);
+router
+  .route("/following/:userId")
+  .get(validate(userIdParamSchema, ValidationSource.PARAM), getUserFollowing);
 
 export default router;

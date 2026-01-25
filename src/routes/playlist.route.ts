@@ -3,6 +3,11 @@ import { authenticate } from "../middlewares/authenticate.middleware";
 import { validate, ValidationSource } from "../middlewares/validate.middleware";
 import { PlaylistSchema } from "../validators/playlist.validator";
 import {
+  playlistIdParamSchema,
+  userIdParamSchema,
+  videoIdParamSchema,
+} from "../validators/common.validator";
+import {
   addVideoToPlaylist,
   createPlaylist,
   deletePlaylist,
@@ -205,7 +210,9 @@ router.route("/me").get(getMyPlaylists);
  *       401:
  *         description: Unauthorized
  */
-router.route("/user/:userId").get(getUserPlaylists);
+router
+  .route("/user/:userId")
+  .get(validate(userIdParamSchema, ValidationSource.PARAM), getUserPlaylists);
 
 /**
  * @swagger
@@ -328,9 +335,13 @@ router.route("/user/:userId").get(getUserPlaylists);
  */
 router
   .route("/:playlistId")
-  .get(getPlaylistById)
-  .patch(validate(PlaylistSchema, ValidationSource.BODY), updatePlaylist)
-  .delete(deletePlaylist);
+  .get(validate(playlistIdParamSchema, ValidationSource.PARAM), getPlaylistById)
+  .patch(
+    validate(playlistIdParamSchema, ValidationSource.PARAM),
+    validate(PlaylistSchema, ValidationSource.BODY),
+    updatePlaylist,
+  )
+  .delete(validate(playlistIdParamSchema, ValidationSource.PARAM), deletePlaylist);
 
 /**
  * @swagger
@@ -415,7 +426,15 @@ router
  */
 router
   .route("/:playlistId/videos/:videoId")
-  .post(addVideoToPlaylist)
-  .delete(removeVideoFromPlaylist);
+  .post(
+    validate(playlistIdParamSchema, ValidationSource.PARAM),
+    validate(videoIdParamSchema, ValidationSource.PARAM),
+    addVideoToPlaylist,
+  )
+  .delete(
+    validate(playlistIdParamSchema, ValidationSource.PARAM),
+    validate(videoIdParamSchema, ValidationSource.PARAM),
+    removeVideoFromPlaylist,
+  );
 
 export default router;

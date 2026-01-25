@@ -5,6 +5,7 @@ import {
   videoQuerySchema,
   videoUpdateDetailsSchema,
 } from "../validators/video.validator";
+import { videoIdParamSchema } from "../validators/common.validator";
 import {
   deleteVideo,
   getAllVideos,
@@ -512,9 +513,13 @@ router
  */
 router
   .route("/:videoId")
-  .get(getVideoById)
-  .patch(validate(videoUpdateDetailsSchema, ValidationSource.BODY), updateVideoDetails)
-  .delete(deleteVideo);
+  .get(validate(videoIdParamSchema, ValidationSource.PARAM), getVideoById)
+  .patch(
+    validate(videoUpdateDetailsSchema, ValidationSource.BODY),
+    validate(videoIdParamSchema, ValidationSource.PARAM),
+    updateVideoDetails,
+  )
+  .delete(validate(videoIdParamSchema, ValidationSource.PARAM), deleteVideo);
 
 /**
  * @swagger
@@ -605,7 +610,13 @@ router
  *       500:
  *         description: Thumbnail upload failed
  */
-router.route("/thumbnail/:videoId").patch(upload.single("thumbnail"), updateVideoThumbnail);
+router
+  .route("/thumbnail/:videoId")
+  .patch(
+    validate(videoIdParamSchema, ValidationSource.PARAM),
+    upload.single("thumbnail"),
+    updateVideoThumbnail,
+  );
 
 /**
  * @swagger
@@ -653,6 +664,8 @@ router.route("/thumbnail/:videoId").patch(upload.single("thumbnail"), updateVide
  *       404:
  *         description: Video not found
  */
-router.route("/publish-status/:videoId").patch(togglePublishStatus);
+router
+  .route("/publish-status/:videoId")
+  .patch(validate(videoIdParamSchema, ValidationSource.PARAM), togglePublishStatus);
 
 export default router;

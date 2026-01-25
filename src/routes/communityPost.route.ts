@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authenticate } from "../middlewares/authenticate.middleware";
 import { validate, ValidationSource } from "../middlewares/validate.middleware";
 import { communityPostSchema } from "../validators/userCommunitypost.validator";
+import { postIdParamSchema, userIdParamSchema } from "../validators/common.validator";
 import {
   createCommunityPost,
   deleteCommunityPost,
@@ -181,7 +182,9 @@ router.route("/").post(validate(communityPostSchema, ValidationSource.BODY), cre
  *       500:
  *         description: Failed to fetch community posts
  */
-router.route("/user/:userId").get(getUserCommunityPosts);
+router
+  .route("/user/:userId")
+  .get(validate(userIdParamSchema, ValidationSource.PARAM), getUserCommunityPosts);
 
 /**
  * @swagger
@@ -279,7 +282,11 @@ router.route("/user/:userId").get(getUserCommunityPosts);
  */
 router
   .route("/:postId")
-  .patch(validate(communityPostSchema, ValidationSource.BODY), updateCommunityPost)
-  .delete(deleteCommunityPost);
+  .patch(
+    validate(postIdParamSchema, ValidationSource.PARAM),
+    validate(communityPostSchema, ValidationSource.BODY),
+    updateCommunityPost,
+  )
+  .delete(validate(postIdParamSchema, ValidationSource.PARAM), deleteCommunityPost);
 
 export default router;

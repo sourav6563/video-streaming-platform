@@ -32,7 +32,7 @@ export const getUserCommunityPosts = asyncHandler(async (req: Request, res: Resp
   const user = await userModel.findById(userId);
 
   if (!user) {
-    throw new ApiError(404, "Invalid Id  User not found");
+    throw new ApiError(404, "User not found");
   }
 
   const postsAggregate = CommunityPost.aggregate([

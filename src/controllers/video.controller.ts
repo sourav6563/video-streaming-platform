@@ -49,11 +49,14 @@ export const uploadVideo = asyncHandler(async (req: Request, res: Response) => {
     }
 
     if (videoFile.size > MAX_VIDEO_SIZE) {
-      throw new ApiError(400, "Video file exceeds 100MB size limit");
+      throw new ApiError(400, `Video file exceeds ${MAX_VIDEO_SIZE / (1024 * 1024)}MB size limit`);
     }
 
     if (thumbnailFile.size > MAX_THUMBNAIL_SIZE) {
-      throw new ApiError(400, "Thumbnail exceeds 5MB size limit");
+      throw new ApiError(
+        400,
+        `Thumbnail exceeds ${MAX_THUMBNAIL_SIZE / (1024 * 1024)}MB size limit`,
+      );
     }
 
     // 2. Upload to Cloudinary

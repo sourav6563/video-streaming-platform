@@ -7,6 +7,13 @@ import {
   toggleVideoLike,
 } from "../controllers/like.controller";
 
+import { validate, ValidationSource } from "../middlewares/validate.middleware";
+import {
+  commentIdParamSchema,
+  postIdParamSchema,
+  videoIdParamSchema,
+} from "../validators/common.validator";
+
 const router = Router();
 
 router.use(authenticate);
@@ -51,7 +58,9 @@ router.use(authenticate);
  *       401:
  *         description: Unauthorized
  */
-router.route("/toggle-video-like/:videoId").post(toggleVideoLike);
+router
+  .route("/toggle-video-like/:videoId")
+  .post(validate(videoIdParamSchema, ValidationSource.PARAM), toggleVideoLike);
 
 /**
  * @swagger
@@ -93,7 +102,9 @@ router.route("/toggle-video-like/:videoId").post(toggleVideoLike);
  *       401:
  *         description: Unauthorized
  */
-router.route("/toggle-comment-like/:commentId").post(toggleCommentLike);
+router
+  .route("/toggle-comment-like/:commentId")
+  .post(validate(commentIdParamSchema, ValidationSource.PARAM), toggleCommentLike);
 
 /**
  * @swagger
@@ -135,7 +146,9 @@ router.route("/toggle-comment-like/:commentId").post(toggleCommentLike);
  *       401:
  *         description: Unauthorized
  */
-router.route("/toggle-community-post-like/:postId").post(toggleCommunityPostLike);
+router
+  .route("/toggle-community-post-like/:postId")
+  .post(validate(postIdParamSchema, ValidationSource.PARAM), toggleCommunityPostLike);
 
 /**
  * @swagger

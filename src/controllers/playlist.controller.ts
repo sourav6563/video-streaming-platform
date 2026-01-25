@@ -72,7 +72,7 @@ export const updatePlaylist = asyncHandler(async (req: Request, res: Response) =
   const playlist = await Playlist.findById(playlistId);
 
   if (!playlist) {
-    throw new ApiError(404, "Invalid Id Playlist not found");
+    throw new ApiError(404, "Playlist not found");
   }
 
   if (!playlist.owner.equals(userId)) {
@@ -92,7 +92,7 @@ export const deletePlaylist = asyncHandler(async (req: Request, res: Response) =
   const playlist = await Playlist.findById(playlistId);
 
   if (!playlist) {
-    throw new ApiError(404, "Invalid Id Playlist not found");
+    throw new ApiError(404, "Playlist not found");
   }
 
   if (!playlist.owner.equals(userId)) {
@@ -111,7 +111,7 @@ export const addVideoToPlaylist = asyncHandler(async (req: Request, res: Respons
   const playlist = await Playlist.findById(playlistId);
 
   if (!playlist) {
-    throw new ApiError(404, "Invalid Id Playlist not found");
+    throw new ApiError(404, "Playlist not found");
   }
 
   if (!playlist.owner.equals(userId)) {
@@ -145,7 +145,7 @@ export const removeVideoFromPlaylist = asyncHandler(async (req: Request, res: Re
   const playlist = await Playlist.findById(playlistId);
 
   if (!playlist) {
-    throw new ApiError(404, " Invalid Id Playlist not found");
+    throw new ApiError(404, "Playlist not found");
   }
 
   if (!playlist.owner.equals(userId)) {
@@ -171,7 +171,7 @@ export const getPlaylistById = asyncHandler(async (req: Request, res: Response) 
   const playlist = await Playlist.findById(playlistId);
 
   if (!playlist) {
-    throw new ApiError(404, "Invalid Id Playlist not found");
+    throw new ApiError(404, "Playlist not found");
   }
 
   const playlistDetails = await Playlist.aggregate([
