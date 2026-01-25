@@ -19,6 +19,8 @@ export const createCommunityPost = asyncHandler(async (req: Request, res: Respon
     owner: userId,
   });
 
+  await post.populate("owner", "username name profileImage");
+
   if (!post) throw new ApiError(500, "Failed to create post");
 
   return res.status(201).json(new apiResponse(201, "Community post created successfully", post));

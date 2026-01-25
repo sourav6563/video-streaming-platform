@@ -29,7 +29,7 @@ const router = Router();
  *         communityPost:
  *           type: string
  *         owner:
- *           type: string
+ *           $ref: '#/components/schemas/CommentOwner'
  *         createdAt:
  *           type: string
  *           format: date-time

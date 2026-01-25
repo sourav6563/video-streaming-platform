@@ -3,6 +3,7 @@ import { env } from "./env";
 export const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: env.NODE_ENV === "production",
+  sameSite: "lax" as const,
 };
 
 export const CookieNames = {

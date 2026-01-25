@@ -19,28 +19,23 @@ export const toggleFollow = asyncHandler(async (req: Request, res: Response) => 
     throw new ApiError(400, "You cannot follow yourself");
   }
 
-  const existingFollow = await Follow.findOne({
+  const deletedFollow = await Follow.findOneAndDelete({
     follower: currentUserId,
     following: userId,
   });
 
-  if (existingFollow) {
-    await Follow.findByIdAndDelete(existingFollow._id);
-
+  if (deletedFollow) {
     return res
       .status(200)
       .json(new apiResponse(200, "Unfollowed successfully", { isFollowed: false }));
-  } else {
-    // If relationship does not exist, FOLLOW (Create)
-    await Follow.create({
-      follower: currentUserId,
-      following: userId,
-    });
-
-    return res
-      .status(200)
-      .json(new apiResponse(200, "Followed successfully", { isFollowed: true }));
   }
+
+  await Follow.create({
+    follower: currentUserId,
+    following: userId,
+  });
+
+  return res.status(200).json(new apiResponse(200, "Followed successfully", { isFollowed: true }));
 });
 
 export const getUserFollowers = asyncHandler(async (req: Request, res: Response) => {

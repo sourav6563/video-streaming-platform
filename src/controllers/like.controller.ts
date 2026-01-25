@@ -17,27 +17,24 @@ export const toggleVideoLike = asyncHandler(async (req: Request, res: Response) 
     throw new ApiError(404, " Invalid Id Video not found");
   }
 
-  const existingLike = await Like.findOne({
+  // Single DB call: delete if exists, otherwise returns null
+  const deletedLike = await Like.findOneAndDelete({
     video: videoId,
     likedBy: userId,
   });
 
-  if (existingLike) {
-    await Like.findByIdAndDelete(existingLike._id);
-
+  if (deletedLike) {
     return res
       .status(200)
       .json(new apiResponse(200, "Video unliked successfully", { isLiked: false }));
-  } else {
-    await Like.create({
-      video: videoId,
-      likedBy: req.user?._id,
-    });
-
-    return res
-      .status(200)
-      .json(new apiResponse(200, "Video liked successfully", { isLiked: true }));
   }
+
+  await Like.create({
+    video: videoId,
+    likedBy: userId,
+  });
+
+  return res.status(200).json(new apiResponse(200, "Video liked successfully", { isLiked: true }));
 });
 
 export const toggleCommentLike = asyncHandler(async (req: Request, res: Response) => {
@@ -50,27 +47,25 @@ export const toggleCommentLike = asyncHandler(async (req: Request, res: Response
     throw new ApiError(404, "Invalid Id Comment not found");
   }
 
-  const existingLike = await Like.findOne({
+  const deletedLike = await Like.findOneAndDelete({
     comment: commentId,
     likedBy: userId,
   });
 
-  if (existingLike) {
-    await Like.findByIdAndDelete(existingLike._id);
-
+  if (deletedLike) {
     return res
       .status(200)
       .json(new apiResponse(200, "Comment unliked successfully", { isLiked: false }));
-  } else {
-    await Like.create({
-      comment: commentId,
-      likedBy: userId,
-    });
-
-    return res
-      .status(200)
-      .json(new apiResponse(200, "Comment liked successfully", { isLiked: true }));
   }
+
+  await Like.create({
+    comment: commentId,
+    likedBy: userId,
+  });
+
+  return res
+    .status(200)
+    .json(new apiResponse(200, "Comment liked successfully", { isLiked: true }));
 });
 
 export const toggleCommunityPostLike = asyncHandler(async (req: Request, res: Response) => {
@@ -82,25 +77,23 @@ export const toggleCommunityPostLike = asyncHandler(async (req: Request, res: Re
     throw new ApiError(404, " Invalid Id Community post not found");
   }
 
-  const existingLike = await Like.findOne({
+  const deletedLike = await Like.findOneAndDelete({
     communityPost: postId,
     likedBy: userId,
   });
 
-  if (existingLike) {
-    await Like.findByIdAndDelete(existingLike._id);
-
+  if (deletedLike) {
     return res
       .status(200)
       .json(new apiResponse(200, "Post unliked successfully", { isLiked: false }));
-  } else {
-    await Like.create({
-      communityPost: postId,
-      likedBy: userId,
-    });
-
-    return res.status(200).json(new apiResponse(200, "Post liked successfully", { isLiked: true }));
   }
+
+  await Like.create({
+    communityPost: postId,
+    likedBy: userId,
+  });
+
+  return res.status(200).json(new apiResponse(200, "Post liked successfully", { isLiked: true }));
 });
 
 export const getLikedVideos = asyncHandler(async (req: Request, res: Response) => {

@@ -101,6 +101,8 @@ export const addVideoComment = asyncHandler(async (req: Request, res: Response) 
     owner: userId,
   });
 
+  await comment.populate("owner", "username name profileImage");
+
   if (!comment) {
     throw new ApiError(500, "Failed to add comment please try again");
   }
@@ -199,6 +201,8 @@ export const addPostComment = asyncHandler(async (req: Request, res: Response) =
     communityPost: postId,
     owner: userId,
   });
+
+  await comment.populate("owner", "username name profileImage");
 
   if (!comment) {
     throw new ApiError(500, "Failed to add comment please try again");

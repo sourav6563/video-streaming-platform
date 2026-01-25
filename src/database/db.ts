@@ -12,7 +12,7 @@ const options = {
   socketTimeoutMS: 45000,
 };
 
-logger.debug(dbURI);
+// logger.debug(dbURI);
 
 function setRunValidators() {
   return { runValidators: true };

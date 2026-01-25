@@ -22,7 +22,7 @@ const router = Router();
  *         content:
  *           type: string
  *         owner:
- *           type: string
+ *           $ref: '#/components/schemas/CommunityPostOwner'
  *         createdAt:
  *           type: string
  *           format: date-time

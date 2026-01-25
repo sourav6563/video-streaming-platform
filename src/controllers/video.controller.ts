@@ -280,9 +280,12 @@ export const getVideoById = asyncHandler(async (req: Request, res: Response) => 
     throw new ApiError(404, "Video not found");
   }
 
-  await Video.findByIdAndUpdate(videoId, {
-    $inc: { views: 1 },
-  });
+  // Only increment views if viewer is not the owner
+  if (!isOwner) {
+    await Video.findByIdAndUpdate(videoId, {
+      $inc: { views: 1 },
+    });
+  }
 
   if (userId) {
     await userModel.findByIdAndUpdate(userId, {
